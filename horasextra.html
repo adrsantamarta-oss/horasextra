@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Horas Extra"/>
+<meta name="theme-color" content="#080f0a"/>
+<title>Horas Extra</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080f0a;--card:#0d1510;--card2:#111a13;--border:#1a2c1e;
+  --text:#e8f5ea;--muted:#4a6b50;--dim:#1e3022;
+  --green:#4ade80;--green2:#22c55e;--green3:#16a34a;
+  --gold:#fbbf24;--blue:#60a5fa;--red:#f87171;--purple:#a78bfa;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;}
+body{display:flex;flex-direction:column;align-items:center;padding:24px 14px 100px;}
+.wrap{width:100%;max-width:440px;}
+
+.header{margin-bottom:20px;}
+.app-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.app-title span{color:var(--green);}
+.app-sub{font-size:10px;color:var(--muted);letter-spacing:3px;margin-top:3px;}
+
+/* Year selector */
+.year-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 16px;margin-bottom:14px;}
+.year-nav{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:6px;transition:color 0.2s;font-family:inherit;}
+.year-nav:hover{color:var(--green);}
+.year-display{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;}
+
+/* Annual summary */
+.annual{background:linear-gradient(145deg,#0a1a0c,#060e08);border:1px solid #1a3020;border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.annual::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,#4ade8018,transparent 70%);}
+.annual-label{font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:6px;}
+.annual-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.annual-box{background:#080f0a;border:1px solid var(--border);border-radius:12px;padding:12px;}
+.abox-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:4px;}
+.abox-val{font-size:22px;font-weight:800;line-height:1;}
+
+/* Month selector */
+.month-grid-wrap{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:14px;}
+.mg-label{font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;}
+.month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.mg-btn{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 4px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;text-align:center;transition:all 0.2s;position:relative;}
+.mg-btn.active{background:#0f2a14;border-color:var(--green);color:var(--green);}
+.mg-btn .dot{position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--green);}
+
+/* Month detail */
+.month-detail{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;}
+.md-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.md-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;}
+.md-period{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:1px;}
+.md-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.ms-box{background:#060e08;border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;}
+.ms-lbl{font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:3px;}
+.ms-val{font-size:18px;font-weight:800;line-height:1;}
+
+/* Salary input */
+.salary-row{display:flex;align-items:center;gap:10px;background:#060e08;border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px;}
+.sal-label{font-size:11px;color:var(--muted);flex:1;letter-spacing:1px;}
+.sal-input{background:none;border:none;color:var(--gold);font-size:16px;font-weight:800;font-family:inherit;text-align:right;outline:none;width:100px;}
+.sal-input::placeholder{color:#2a4020;font-weight:400;}
+.sal-euro{font-size:14px;color:var(--gold);font-weight:700;}
+
+/* Period info */
+.period-info{background:#0a140c;border:1px solid #1a2c1e;border-radius:10px;padding:10px 13px;margin-bottom:12px;font-size:11px;color:var(--muted);letter-spacing:0.5px;display:flex;align-items:center;gap:7px;}
+.period-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+
+/* Add hours form */
+.add-hours{display:flex;gap:8px;margin-bottom:12px;}
+.date-input{flex:1;background:#060e08;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:13px;font-family:inherit;outline:none;transition:border 0.2s;}
+.date-input:focus{border-color:#4ade8044;}
+.hours-input{width:80px;background:#060e08;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:13px;font-family:inherit;outline:none;text-align:center;transition:border 0.2s;}
+.hours-input:focus{border-color:#4ade8044;}
+.btn-add-h{background:var(--green2);border:none;border-radius:10px;color:#030e05;padding:10px 16px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-add-h:hover{opacity:0.85;}
+
+/* Days list */
+.days-list{max-height:260px;overflow-y:auto;}
+.day-row{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid #0d1a0f;transition:background 0.15s;}
+.day-row:last-child{border-bottom:none;}
+.day-date{font-size:12px;color:var(--muted);min-width:80px;}
+.day-bar-wrap{flex:1;}
+.day-bar-bg{height:6px;background:#0a140c;border-radius:3px;overflow:hidden;}
+.day-bar-fill{height:100%;background:linear-gradient(90deg,var(--green3),var(--green));border-radius:3px;transition:width 0.4s;}
+.day-hours{font-size:13px;font-weight:700;color:var(--green);min-width:40px;text-align:right;}
+.btn-del-h{background:none;border:none;color:var(--dim);cursor:pointer;font-size:13px;padding:3px;border-radius:4px;transition:color 0.15s;}
+.btn-del-h:hover{color:var(--red);}
+.empty-days{padding:16px;text-align:center;color:var(--dim);font-size:11px;letter-spacing:1px;}
+
+#notif{position:fixed;top:16px;right:16px;z-index:999;background:#0a1a0c;border:1px solid #1a3020;color:var(--green);padding:10px 16px;border-radius:8px;font-size:12px;letter-spacing:1px;opacity:0;transform:translateY(-10px);transition:all 0.25s;pointer-events:none;}
+#notif.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:400px){.date-input,.hours-input,.sal-input{font-size:16px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div id="notif"></div>
+
+<div class="header">
+  <div class="app-title">Horas <span>Extra</span></div>
+  <div class="app-sub">CONTROL DE JORNADA</div>
+</div>
+
+<!-- Year selector -->
+<div class="year-bar">
+  <button class="year-nav" onclick="changeYear(-1)">‹</button>
+  <span class="year-display" id="year-display">2026</span>
+  <button class="year-nav" onclick="changeYear(1)">›</button>
+</div>
+
+<!-- Annual summary -->
+<div class="annual">
+  <div class="annual-label">RESUMEN ANUAL</div>
+  <div class="annual-grid">
+    <div class="annual-box">
+      <div class="abox-lbl">HORAS TOTALES</div>
+      <div class="abox-val" style="color:var(--green)" id="ann-hours">0h</div>
+    </div>
+    <div class="annual-box">
+      <div class="abox-lbl">SUELDO COBRADO</div>
+      <div class="abox-val" style="color:var(--gold)" id="ann-salary">€0</div>
+    </div>
+  </div>
+</div>
+
+<!-- Month selector -->
+<div class="month-grid-wrap">
+  <div class="mg-label">SELECCIONA MES</div>
+  <div class="month-grid" id="month-grid"></div>
+</div>
+
+<!-- Month detail -->
+<div class="month-detail">
+  <div class="md-header">
+    <div>
+      <div class="md-title" id="md-title">Enero 2026</div>
+      <div class="md-period" id="md-period">Periodo: 25 Dic → 25 Ene</div>
+    </div>
+  </div>
+
+  <div class="md-stats">
+    <div class="ms-box">
+      <div class="ms-lbl">HORAS EXTRA</div>
+      <div class="ms-val" style="color:var(--green)" id="ms-hours">0h</div>
+    </div>
+    <div class="ms-box">
+      <div class="ms-lbl">DÍAS CON EXTRA</div>
+      <div class="ms-val" style="color:var(--blue)" id="ms-days">0</div>
+    </div>
+    <div class="ms-box">
+      <div class="ms-lbl">MEDIA/DÍA</div>
+      <div class="ms-val" style="color:var(--purple)" id="ms-avg">0h</div>
+    </div>
+  </div>
+
+  <!-- Salary -->
+  <div class="salary-row">
+    <span class="sal-label">SUELDO DE ESTE MES</span>
+    <span class="sal-euro">€</span>
+    <input class="sal-input" id="sal-input" type="number" min="0" step="any" placeholder="0,00" oninput="saveSalary()"/>
+  </div>
+
+  <!-- Period info -->
+  <div class="period-info">
+    <div class="period-dot"></div>
+    <span id="period-info-text">Las horas extra van del 25 del mes anterior al 25 de este mes</span>
+  </div>
+
+  <!-- Add hours -->
+  <div class="add-hours">
+    <input class="date-input" id="inp-date" type="date"/>
+    <input class="hours-input" id="inp-hours" type="number" min="0.5" max="12" step="0.5" placeholder="h"/>
+    <button class="btn-add-h" onclick="addHours()">+ Añadir</button>
+  </div>
+
+  <!-- Days list -->
+  <div class="days-list" id="days-list"></div>
+</div>
+
+</div>
+<script>
+const STORAGE_KEY = "horasextra_v1";
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const MONTHS_SHORT = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth(); // 0-11
+let data = {}; // { "2026_0": { salary: 0, hours: [{date, hours}] }, ... }
+let nt;
+
+function key(y, m) { return `${y}_${m}`; }
+function load() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) data = JSON.parse(r); } catch(e) {} }
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function getMonth(y, m) { if (!data[key(y,m)]) data[key(y,m)] = { salary: 0, hours: [] }; return data[key(y,m)]; }
+
+function fmt(v) { return new Intl.NumberFormat("es-ES",{style:"currency",currency:"EUR",minimumFractionDigits:0,maximumFractionDigits:0}).format(v); }
+function fmtH(h) { const w = Math.floor(h); const d = h % 1; return d ? `${w}h ${Math.round(d*60)}m` : `${w}h`; }
+
+function notify(msg, color) {
+  const el = document.getElementById("notif");
+  el.textContent = msg; el.style.color = color || "var(--green)";
+  el.classList.add("show"); clearTimeout(nt);
+  nt = setTimeout(() => el.classList.remove("show"), 2200);
+}
+
+// Periodo: horas extra del 25 del mes anterior al 25 del mes actual
+// Ej: nómina de Enero = horas del 25 Dic al 25 Ene
+function getPeriodDates(year, month) {
+  // Inicio: 25 del mes anterior
+  let startM = month - 1, startY = year;
+  if (startM < 0) { startM = 11; startY--; }
+  const start = new Date(startY, startM, 25);
+  const end = new Date(year, month, 25);
+  return { start, end };
+}
+
+function dateInPeriod(dateStr, year, month) {
+  const { start, end } = getPeriodDates(year, month);
+  const d = new Date(dateStr + "T00:00:00");
+  return d >= start && d < end;
+}
+
+function getPeriodLabel(year, month) {
+  let pm = month - 1, py = year;
+  if (pm < 0) { pm = 11; py--; }
+  return `25 ${MONTHS[pm].slice(0,3)} → 25 ${MONTHS[month].slice(0,3)}`;
+}
+
+function changeYear(d) { currentYear += d; renderAll(); }
+
+// Set today's date on date input
+function setTodayDate() {
+  const t = new Date();
+  const s = t.toISOString().split("T")[0];
+  document.getElementById("inp-date").value = s;
+}
+
+function addHours() {
+  const dateVal = document.getElementById("inp-date").value;
+  const hoursVal = parseFloat(document.getElementById("inp-hours").value);
+  if (!dateVal) { notify("Selecciona una fecha", "var(--red)"); return; }
+  if (isNaN(hoursVal) || hoursVal <= 0) { notify("Pon las horas del día", "var(--red)"); return; }
+
+  // Buscar a qué mes pertenece según el periodo 25-25
+  let targetY = currentYear, targetM = currentMonth;
+  // Comprobar si la fecha cae en el periodo del mes actual
+  if (!dateInPeriod(dateVal, currentYear, currentMonth)) {
+    // Intentar mes siguiente
+    let nm = currentMonth + 1, ny = currentYear;
+    if (nm > 11) { nm = 0; ny++; }
+    if (dateInPeriod(dateVal, ny, nm)) {
+      targetY = ny; targetM = nm;
+      notify(`Añadido al periodo de ${MONTHS[targetM]} ${targetY}`);
+    } else {
+      // Intentar mes anterior
+      let pm = currentMonth - 1, py = currentYear;
+      if (pm < 0) { pm = 11; py--; }
+      if (dateInPeriod(dateVal, py, pm)) {
+        targetY = py; targetM = pm;
+        notify(`Añadido al periodo de ${MONTHS[targetM]} ${targetY}`);
+      } else {
+        notify("Fecha fuera de rango", "var(--red)"); return;
+      }
+    }
+  }
+
+  const m = getMonth(targetY, targetM);
+  // Si ya existe ese día, sumar horas
+  const existing = m.hours.find(h => h.date === dateVal);
+  if (existing) {
+    existing.hours += hoursVal;
+    notify(`+${fmtH(hoursVal)} sumadas al ${formatDate(dateVal)}`);
+  } else {
+    m.hours.push({ date: dateVal, hours: hoursVal });
+    notify(`${fmtH(hoursVal)} añadidas el ${formatDate(dateVal)}`);
+  }
+  save();
+  document.getElementById("inp-hours").value = "";
+  renderAll();
+}
+
+function deleteHours(dateStr) {
+  const m = getMonth(currentYear, currentMonth);
+  m.hours = m.hours.filter(h => h.date !== dateStr);
+  save(); notify("Eliminado", "var(--muted)"); renderAll();
+}
+
+function saveSalary() {
+  const val = parseFloat(document.getElementById("sal-input").value);
+  const m = getMonth(currentYear, currentMonth);
+  m.salary = isNaN(val) ? 0 : val;
+  save(); renderSummary();
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("es-ES", { day:"2-digit", month:"short" });
+}
+
+function renderMonthGrid() {
+  const grid = document.getElementById("month-grid");
+  grid.innerHTML = "";
+  MONTHS_SHORT.forEach((ms, i) => {
+    const md = getMonth(currentYear, i);
+    const hasData = md.hours.length > 0 || md.salary > 0;
+    const btn = document.createElement("button");
+    btn.className = "mg-btn" + (i === currentMonth ? " active" : "");
+    btn.innerHTML = ms + (hasData ? '<span class="dot"></span>' : "");
+    btn.onclick = () => { currentMonth = i; renderAll(); };
+    grid.appendChild(btn);
+  });
+}
+
+function renderSummary() {
+  // Annual totals
+  let annHours = 0, annSalary = 0;
+  for (let m = 0; m < 12; m++) {
+    const md = getMonth(currentYear, m);
+    annHours += md.hours.reduce((a, h) => a + h.hours, 0);
+    annSalary += md.salary || 0;
+  }
+  document.getElementById("ann-hours").textContent = fmtH(annHours);
+  document.getElementById("ann-salary").textContent = fmt(annSalary);
+}
+
+function renderMonthDetail() {
+  const md = getMonth(currentYear, currentMonth);
+  const totalH = md.hours.reduce((a, h) => a + h.hours, 0);
+  const days = md.hours.length;
+  const avg = days > 0 ? totalH / days : 0;
+
+  document.getElementById("md-title").textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+  document.getElementById("md-period").textContent = `Periodo horas extra: ${getPeriodLabel(currentYear, currentMonth)}`;
+  document.getElementById("ms-hours").textContent = fmtH(totalH);
+  document.getElementById("ms-days").textContent = days;
+  document.getElementById("ms-avg").textContent = fmtH(avg);
+
+  // Salary
+  const salInp = document.getElementById("sal-input");
+  salInp.value = md.salary || "";
+
+  // Period info
+  const { start, end } = getPeriodDates(currentYear, currentMonth);
+  document.getElementById("period-info-text").textContent =
+    `Horas: del ${start.toLocaleDateString("es-ES",{day:"2-digit",month:"short"})} al ${end.toLocaleDateString("es-ES",{day:"2-digit",month:"short"})}`;
+
+  // Days list
+  const list = document.getElementById("days-list");
+  if (!md.hours.length) {
+    list.innerHTML = '<div class="empty-days">Sin horas extra este periodo</div>';
+    return;
+  }
+  const sorted = [...md.hours].sort((a,b) => a.date.localeCompare(b.date));
+  const maxH = Math.max(...sorted.map(h => h.hours));
+  list.innerHTML = "";
+  sorted.forEach(h => {
+    const row = document.createElement("div");
+    row.className = "day-row";
+    row.innerHTML = `
+      <div class="day-date">${formatDate(h.date)}</div>
+      <div class="day-bar-wrap">
+        <div class="day-bar-bg">
+          <div class="day-bar-fill" style="width:${(h.hours/maxH)*100}%"></div>
+        </div>
+      </div>
+      <div class="day-hours">${fmtH(h.hours)}</div>
+      <button class="btn-del-h" onclick="deleteHours('${h.date}')">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function renderAll() {
+  document.getElementById("year-display").textContent = currentYear;
+  renderMonthGrid();
+  renderSummary();
+  renderMonthDetail();
+}
+
+document.getElementById("inp-hours").addEventListener("keydown", e => { if(e.key==="Enter") addHours(); });
+
+load();
+setTodayDate();
+renderAll();
+</script>
+</body>
+</html>
